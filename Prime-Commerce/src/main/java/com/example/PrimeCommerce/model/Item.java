@@ -7,26 +7,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "cart")
-public class Cart {
+@Table(name = "item")
+public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    int cartTotal;
+    int requiredQuantity;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn
-    Customer customer;
+    Cart cart;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    List<Item> itemList = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn
+    OrderEntity orderEntity;
+
+    @ManyToOne
+    @JoinColumn
+    Product product;
+
 }

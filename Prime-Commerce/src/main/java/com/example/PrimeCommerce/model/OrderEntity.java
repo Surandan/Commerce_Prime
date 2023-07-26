@@ -6,8 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import org.hibernate.annotations.CreationTimestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,18 +16,26 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "cart")
-public class Cart {
+@Table(name = "order_info")
+public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    int cartTotal;
+    String orderId;
 
-    @OneToOne
+    @CreationTimestamp
+    Date orderDate;
+
+    String cardUsed;
+
+    int orderTotal;
+
+    @ManyToOne
     @JoinColumn
     Customer customer;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "orderEntity",cascade = CascadeType.ALL)
     List<Item> itemList = new ArrayList<>();
 }

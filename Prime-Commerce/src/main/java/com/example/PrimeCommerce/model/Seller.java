@@ -15,18 +15,20 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "cart")
-public class Cart {
+@Table(name = "seller")
+public class Seller {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    int cartTotal;
+    String name;
 
-    @OneToOne
-    @JoinColumn
-    Customer customer;
+    @Column(unique = true, nullable = false)
+    String emailId;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    List<Item> itemList = new ArrayList<>();
+    @Column(unique = true, nullable = false)
+    String panNo;
+
+    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
+    List<Product> productList = new ArrayList<>();
 }

@@ -1,5 +1,7 @@
 package com.example.PrimeCommerce.model;
 
+import com.example.PrimeCommerce.Enum.ProductCategory;
+import com.example.PrimeCommerce.Enum.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,24 +11,34 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "cart")
-public class Cart {
+@Table(name = "product")
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    int cartTotal;
+    String productName;
 
-    @OneToOne
+    int price;
+
+    int availableQuantity;
+
+    ProductCategory productCategory;
+
+    ProductStatus productStatus;
+
+    @ManyToOne
     @JoinColumn
-    Customer customer;
+    Seller seller;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
     List<Item> itemList = new ArrayList<>();
+
 }
