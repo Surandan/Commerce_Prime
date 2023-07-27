@@ -2,10 +2,7 @@ package com.example.PrimeCommerce.model;
 
 import com.example.PrimeCommerce.Enum.Gender;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data  // contains @getter @setter @requiredConstructor
+@Builder
 @Table(name = "customer")
 public class Customer {
     @Id
@@ -30,6 +28,7 @@ public class Customer {
     @Column(unique = true)
     String emailId;
 
+    @Enumerated(EnumType.STRING)
     Gender gender;
 
     @OneToOne(mappedBy = "customer",cascade = CascadeType.ALL)

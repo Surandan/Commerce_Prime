@@ -1,25 +1,20 @@
-package com.example.PrimeCommerce.model;
+package com.example.PrimeCommerce.dto.request;
 
 import com.example.PrimeCommerce.Enum.CardType;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 
-@Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-@Table(name = "card")
-public class Card {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+public class CardRequestDto {
 
-    @Column(unique = true)
+    String customerMobileNo;
+
     String cardNo;
 
     int cvv;
@@ -27,8 +22,4 @@ public class Card {
     Date validTill;
 
     CardType cardType;
-
-    @ManyToOne
-    @JoinColumn
-    Customer customer;
 }
