@@ -38,7 +38,7 @@ public class CardServiceImpl implements CardService {
 
     }
 
-    private String generateMaskedNo(String cardNo) {
+    public String generateMaskedNo(String cardNo) {
 
         StringBuilder maskedNo = new StringBuilder(cardNo);
         maskedNo.replace(0, 12, new String(new char[12]).replace('\0','X'));

@@ -1,19 +1,22 @@
 package com.example.PrimeCommerce.service.impl;
 
+import com.example.PrimeCommerce.dto.request.CheckOutRequestDto;
 import com.example.PrimeCommerce.dto.request.ItemRequestDto;
 import com.example.PrimeCommerce.dto.response.CartResponseDto;
-import com.example.PrimeCommerce.model.Cart;
-import com.example.PrimeCommerce.model.Customer;
-import com.example.PrimeCommerce.model.Item;
-import com.example.PrimeCommerce.model.Product;
-import com.example.PrimeCommerce.repository.CartRepository;
-import com.example.PrimeCommerce.repository.CustomerRepository;
-import com.example.PrimeCommerce.repository.ItemRepository;
-import com.example.PrimeCommerce.repository.ProductRepository;
+import com.example.PrimeCommerce.dto.response.OrderResponseDto;
+import com.example.PrimeCommerce.exception.CustomerNotFoundException;
+import com.example.PrimeCommerce.exception.EmptyCartException;
+import com.example.PrimeCommerce.exception.InvalidCardException;
+import com.example.PrimeCommerce.model.*;
+import com.example.PrimeCommerce.repository.*;
 import com.example.PrimeCommerce.service.CartService;
 import com.example.PrimeCommerce.transformer.CartTransformer;
+import com.example.PrimeCommerce.transformer.OrderTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -29,6 +32,15 @@ public class CartServiceImpl implements CartService {
     @Autowired
     CartRepository cartRepository;
 
+    @Autowired
+    CardRepository cardRepository;
+
+    @Autowired
+    OrderEntityServiceImpl orderEntityService;
+
+    @Autowired
+    OrderEntityRepository orderEntityRepository;
+
     @Override
     public CartResponseDto addToCart(Item item, ItemRequestDto itemRequestDto) {
 
@@ -43,12 +55,50 @@ public class CartServiceImpl implements CartService {
 
         Item savedItem = itemRepository.save(item);
 
-        cart.getItemList().add(item);
-        product.getItemList().add(item);
+        cart.getItemList().add(savedItem);
+        product.getItemList().add(savedItem);
 
         Cart savedCart = cartRepository.save(cart);
         productRepository.save(product);
 
         return CartTransformer.CartToCartReponseDto(savedCart);
     }
+
+    @Override
+    public OrderResponseDto checkOutCart(CheckOutRequestDto checkOutRequestDto) {
+
+        Customer customer = customerRepository.findByEmailId(checkOutRequestDto.getCustomerEmail());
+        if(customer==null){
+            throw new CustomerNotFoundException("Customer doesn't exist");
+        }
+
+        Date currentDate = new Date();
+        Card card = cardRepository.findByCardNo(checkOutRequestDto.getCardNo());
+        if(card==null || card.getCvv()!= checkOutRequestDto.getCvv() || currentDate.after(card.getValidTill())){
+            throw new InvalidCardException("Card is not valid");
+        }
+
+        Cart cart = customer.getCart();
+        if(cart.getItemList().isEmpty()) throw new EmptyCartException("Sorry! The cart is empty");
+
+        OrderEntity orderEntity = orderEntityService.placeOrder(cart,card);
+
+        orderEntityService.sendEmail(orderEntity);
+
+        resetCart(cart);
+
+        OrderEntity savedOrder = orderEntityRepository.save(orderEntity);
+
+        return OrderTransformer.OrderToOrderResponseDto(savedOrder);
+
+    }
+
+    public void resetCart(Cart cart) {
+        cart.setCartTotal(0);
+        for(Item item : cart.getItemList()) {
+            item.setCart(null);
+        }
+        cart.setItemList(new ArrayList<>());
+    }
 }
+

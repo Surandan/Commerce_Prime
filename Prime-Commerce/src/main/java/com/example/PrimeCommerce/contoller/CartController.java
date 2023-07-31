@@ -1,7 +1,9 @@
 package com.example.PrimeCommerce.contoller;
 
+import com.example.PrimeCommerce.dto.request.CheckOutRequestDto;
 import com.example.PrimeCommerce.dto.request.ItemRequestDto;
 import com.example.PrimeCommerce.dto.response.CartResponseDto;
+import com.example.PrimeCommerce.dto.response.OrderResponseDto;
 import com.example.PrimeCommerce.model.Item;
 import com.example.PrimeCommerce.service.CartService;
 import com.example.PrimeCommerce.service.ItemService;
@@ -32,6 +34,18 @@ public class CartController {
             Item item = itemService.createItem(itemRequestDto);
             CartResponseDto cartResponseDto = cartService.addToCart(item,itemRequestDto);
             return new ResponseEntity(cartResponseDto, HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/checkOut")
+    public ResponseEntity checkOutCart(@RequestBody CheckOutRequestDto checkOutRequestDto) {
+
+        try{
+            OrderResponseDto orderResponseDto = cartService.checkOutCart(checkOutRequestDto);
+            return new ResponseEntity(orderResponseDto, HttpStatus.CREATED);
         }
         catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
